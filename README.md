@@ -2,13 +2,13 @@
 
 A local-first React diagramming template. No account, API key, backend or paid service is needed to view a diagram.
 
-**Current increment:** a read-only project site, portable offline viewer and validated JSON source. Visual editing, recovery, image export and deployment automation are still being implemented against [USER_STORIES.md](USER_STORIES.md).
+**Current increment:** a project site with visual editing, undo/redo, opt-in browser recovery, a portable viewer build and validated JSON source. Changed-document portable viewing export, image export and deployment automation are still being implemented against [USER_STORIES.md](USER_STORIES.md).
 
 ## View — no terminal needed
 
 Open the project-site link supplied by its owner, or double-click a supplied `index.html` portable viewer. The complete viewer is bundled into that one HTML file; it requires no local server, network connection or installation. This repository does not yet publish a hosted site or prebuilt release.
 
-The initial view fits the complete diagram. Zoom in or expand **Read as text** to read a large diagram or use a small screen; drag the background to pan. **Open JSON** loads another diagram only in your browser. **Download JSON** requests a copy of the current editable document. Opening a file does not upload it, update Git, or change what someone sees at a published link. This read-only increment does not use browser storage.
+The initial view fits the complete diagram. Zoom in or expand **Read as text** to read a large diagram or use a small screen; drag the background to pan. **Open JSON** loads another diagram only in your browser. **Download JSON** requests a copy of the current editable document. Opening a file does not upload it, update Git, or change what someone sees at a published link. The published page does not automatically load a private browser draft. Select **Edit diagram** to start a local workspace; if a recovery draft exists, choose whether to resume it or explicitly replace it with the current diagram. Browser recovery is not a portable file or repository save.
 
 - `diagrams/*.json`: canonical editable source; keep these in Git.
 - `dist/index.html`: generated, self-contained viewing file and complete React project site. It contains the bundled diagram, not a private file you subsequently open.
@@ -38,7 +38,7 @@ For offline QA, open the actual `dist/index.html` directly in a browser. For pro
 
 See [document format](docs/DOCUMENT_FORMAT.md). Unknown JSON fields are retained as inert metadata, not passed into React Flow as renderer configuration. A malformed or unsupported import leaves the previous valid diagram intact. Opening fits the view without changing the source's saved viewport or human coordinates.
 
-Before handing off a changed diagram: identify the exact JSON file, validate it, render it, inspect labels/overlaps/clipping/arrow meaning, and iterate. Schema validation alone is not visual review. Preserve before/after renders for meaningful visual changes. The current UI is view-only; edit the source in an editor, then reopen it.
+Before handing off a changed diagram: identify the exact JSON file, validate it, render it, inspect labels/overlaps/clipping/arrow meaning, and iterate. Schema validation alone is not visual review. Preserve before/after renders for meaningful visual changes. Use **Edit diagram** for visual changes or **Edit JSON** for a staged source replacement. Apply commits a form; Cancel leaves the document unchanged. Undo/Redo restore up to 50 changes within a 25 MB history budget in the current session; closing the page loses that history. Download JSON before handing work to another person or AI. See [editing and recovery](docs/EDITOR_STATE.md) for limits and failure behavior.
 
 ## Dependencies and licensing
 

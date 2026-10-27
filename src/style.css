@@ -496,3 +496,39 @@ button:focus-visible,a:focus-visible {
 .text-outline li {
   margin:8px 0
 }
+
+/* Editing is an explicit local workspace, visually distinct from the default reader. */
+button:disabled { opacity:.45; cursor:not-allowed }
+input,select,textarea { font:inherit; color:inherit; border:1px solid #cfd7cf; border-radius:7px; padding:8px; background:#fff; width:100%; min-width:0 }
+input:focus-visible,select:focus-visible,textarea:focus-visible { outline:3px solid #749a86; outline-offset:2px }
+.editor-toolbar,.button-row { display:flex; gap:8px; flex-wrap:wrap; align-items:center }
+.editor-toolbar { padding:12px 24px; border-top:1px solid #e5e9e1; background:#f5f8f1 }
+.hint { color:#6c7b70; font-size:11px; line-height:1.5 }
+.editor-toolbar .hint { margin-left:auto }
+.editor-layout.editing { display:grid; grid-template-columns:minmax(0,1fr) 280px }
+.editor-layout .canvas { position:relative; min-width:0 }
+.editor-layout.editing .canvas { height:580px }
+.inspector { padding:18px; border-left:1px solid #e5e9e1; background:#fcfdf9; font-size:12px }
+.inspector h3 { margin:0 0 8px; font-size:14px }
+.inspector label { display:block; font-weight:600; margin:10px 0 }
+.inspector label input,.inspector label select,.inspector label textarea { display:block; margin-top:4px; font-weight:400 }
+.inspector textarea { min-height:72px; resize:vertical }
+.inspector button { padding:7px 11px; font-size:12px }
+.inspector hr { border:0; border-top:1px solid #e5e9e1; margin:18px 0 }
+.danger { color:#8a3730 }
+.is-editing .react-flow__handle { opacity:1; pointer-events:all; width:12px; height:12px; background:#537b62; border:2px solid #fff }
+.react-flow__node.selected .diagram-card { outline:3px solid #537b62; outline-offset:3px }
+.react-flow__edge.selected .react-flow__edge-path { stroke:#234f3e; stroke-width:3 }
+.save-state { display:flex; flex-direction:column; align-items:flex-start; gap:4px; padding:14px 24px; background:#f5f8f1; color:#65725e; font-size:11px; overflow-wrap:anywhere }
+.save-state strong { color:#324d3e; font-weight:600 }
+.canvas-empty { pointer-events:none; position:absolute; top:45%; left:15%; right:15%; text-align:center; font-size:14px; color:#738275 }
+.editor-dialog { width:min(700px,calc(100% - 32px)); max-height:85vh; overflow:auto; border:1px solid #becbbb; border-radius:14px; padding:24px; color:#213d32; background:#fcfdf9; box-shadow:0 20px 80px #152e3540 }
+.editor-dialog::backdrop { background:#1a302b66 }
+.editor-dialog h2 { margin-top:0; font-size:20px }
+.editor-dialog p { font-size:13px; overflow-wrap:anywhere }
+.json-editor { height:45vh; resize:vertical; font:12px/1.5 ui-monospace,monospace; white-space:pre }
+@media(max-width:900px) { .editor-layout.editing { grid-template-columns:1fr } .editor-layout.editing .canvas { height:410px } .inspector { border-left:0; border-top:1px solid #e5e9e1 } .editor-toolbar .hint { flex-basis:100%; margin-left:0 } }
+@media(max-width:560px) { .editor-toolbar { padding:12px 15px } .editor-toolbar button { padding:8px 11px; font-size:12px } .save-state { padding:12px 15px } .editor-dialog { padding:18px } .editor-layout.editing .canvas { height:360px } }
+.edge-label { position:absolute; pointer-events:all; max-width:160px; width:max-content; white-space:pre-wrap; overflow-wrap:anywhere; padding:3px 6px; border:1px solid transparent; border-radius:4px; background:#f9fbf7; color:#617065; font-size:12px; font-weight:400; line-height:1.4 }
+.edge-label:disabled { opacity:1; cursor:default; pointer-events:none }
+.edge-label.selected { border-color:#537b62; color:#234f3e; background:#edf4e8 }

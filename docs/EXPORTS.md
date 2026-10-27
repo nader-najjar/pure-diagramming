@@ -18,7 +18,7 @@ The tested React Flow image path pins `html-to-image` to **1.11.11**, as require
 
 1. Download the latest JSON; identify its exact filename/revision and who holds it. Save it beside project documentation, for example `diagrams/example.json`.
 2. Make only the requested semantic edits. Preserve stable IDs, array order, unknown metadata, coordinates and saved viewport. Place new components deliberately; do not automatically relayout existing work.
-3. Validate with `npm run validate` (for repository diagrams), then open that exact JSON in the viewer. Inspect labels, connection meaning, arrow direction, overlap and clipping. Use Edit for visual refinement and download the revised JSON.
+3. Validate with `bazel test //:validate_diagrams` (for repository diagrams), then open that exact JSON in the viewer. Inspect labels, connection meaning, arrow direction, overlap and clipping. Use Edit for visual refinement and download the revised JSON.
 4. Export and open the **actual PNG**, checking all content rather than trusting a successful download. Keep before/after renders for meaningful changes. Download HTML and open the actual viewing file too; distinguish an HTTP check from a local-file/offline check.
 5. Commit the reviewed JSON, not browser state. Generated HTML/PNG are presentation copies, not substitutes for the source. State browser/device or inspection limits explicitly.
 

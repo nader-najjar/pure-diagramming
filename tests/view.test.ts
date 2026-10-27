@@ -1,11 +1,27 @@
-import { test } from 'node:test';
+import { test } from 'vitest';
 import assert from 'node:assert/strict';
 import { edgeLabelMaxWidth, minimumFitZoom } from '../src/view.ts';
-import { parseDiagram } from '../src/model.ts';
-const document = (xs: number[], ys = xs.map(() => 0)) => parseDiagram(JSON.stringify({ schemaVersion: 1, title: 'Wide diagram', viewport: { x: 0, y: 0, zoom: 1 }, nodes: xs.map((x, i) => ({ id: String(i), position: { x, y: ys[i] }, data: { label: 'Node' } })), edges: [] }));
+import { parseDiagram, type Diagram } from '../src/model.ts';
+const document = (xs: readonly number[], ys: readonly number[] = xs.map(() => 0)): Diagram =>
+  parseDiagram(
+    JSON.stringify({
+      schemaVersion: 1,
+      title: 'Wide diagram',
+      viewport: { x: 0, y: 0, zoom: 1 },
+      nodes: xs.map((x, i) => ({ id: String(i), position: { x, y: ys[i] }, data: { label: 'Node' } })),
+      edges: []
+    })
+  );
 test('minimum fit zoom accommodates widely separated accepted nodes and narrow canvases', () => {
-  for (const [width, height] of [[1100, 450], [320, 360], [1, 1]]) {
-    for (const xs of [[0, 100_000], [-1_000_000, 1_000_000]]) {
+  for (const [width, height] of [
+    [1100, 450],
+    [320, 360],
+    [1, 1]
+  ] as const) {
+    for (const xs of [
+      [0, 100_000],
+      [-1_000_000, 1_000_000]
+    ] as const) {
       const doc = document(xs, xs);
       const zoom = minimumFitZoom(doc, width, height);
       assert.ok(zoom > 0 && Number.isFinite(zoom));

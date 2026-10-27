@@ -1,28 +1,58 @@
-import { test } from 'node:test';
+import { test } from 'vitest';
 import assert from 'node:assert/strict';
 import { parseDiagram, serialize, type Diagram } from '../src/model.ts';
 import {
-  HISTORY_LIMIT, HISTORY_BYTE_LIMIT, createHistory, reduceHistory, hasUndownloadedChanges,
-  addNode, moveNode, editNode, renameDiagram, renameEdge, removeElement, connectNodes,
-  readRecovery, writeRecovery,
+  HISTORY_LIMIT,
+  HISTORY_BYTE_LIMIT,
+  createHistory,
+  reduceHistory,
+  hasUndownloadedChanges,
+  addNode,
+  moveNode,
+  editNode,
+  renameDiagram,
+  renameEdge,
+  removeElement,
+  connectNodes,
+  readRecovery,
+  writeRecovery
 } from '../src/editor-state.ts';
 
+function nodeAt(document: Diagram): Diagram['nodes'][number] {
+  const item = document.nodes[0];
+  assert.ok(item, 'Expected fixture nodes item');
+  return item;
+}
+
+function edgeAt(document: Diagram, index: number): Diagram['edges'][number] {
+  const item = document.edges[index];
+  assert.ok(item, 'Expected fixture edges item');
+  return item;
+}
+
 const sample = (): Diagram => ({
-  schemaVersion: 1, title: 'Illustrative history', extra: { owner: 'human' },
+  schemaVersion: 1,
+  title: 'Illustrative history',
+  extra: { owner: 'human' },
   nodes: [
-    { id: 'a', position: { x: 15.125, y: -2.75, note: 'manual' }, data: { label: 'A', color: 'blue', extra: [1, 2] }, extra: { owner: 'human' } },
+    {
+      id: 'a',
+      position: { x: 15.125, y: -2.75, note: 'manual' },
+      data: { label: 'A', color: 'blue', extra: [1, 2] },
+      extra: { owner: 'human' }
+    },
     { id: 'b', position: { x: 320, y: 0 }, data: { label: 'B' } },
-    { id: 'c', position: { x: 640, y: 0 }, data: { label: 'C' } },
+    { id: 'c', position: { x: 640, y: 0 }, data: { label: 'C' } }
   ],
   edges: [{ id: 'ab', source: 'a', target: 'b', label: 'handoff', extra: { direction: 'human choice' } }],
-  viewport: { x: 10, y: 20, zoom: 0.7, extra: true },
+  viewport: { x: 10, y: 20, zoom: 0.7, extra: true }
 });
 
 test('every document mutation and replacement restores exactly through undo and redo', () => {
   const original = sample();
   let state = createHistory(original);
   const snapshots = [serialize(original)];
-  const commit = (document: Diagram) => {
+  const commit = (document: Diagram): void => {
     state = reduceHistory(state, { type: 'commit', document });
     snapshots.push(serialize(state.document));
   };
@@ -34,7 +64,13 @@ test('every document mutation and replacement restores exactly through undo and 
   commit(connectNodes(state.document, { id: 'bc', source: 'b', target: 'c', label: 'connect' }));
   commit(removeElement(state.document, 'a', 'node'));
   commit(removeElement(state.document, 'bc', 'edge'));
-  commit({ ...sample(), title: 'Imported replacement', nodes: [], edges: [], viewport: { x: 3, y: 4, zoom: 1.2 } });
+  commit({
+    ...sample(),
+    title: 'Imported replacement',
+    nodes: [],
+    edges: [],
+    viewport: { x: 3, y: 4, zoom: 1.2 }
+  });
   for (let i = snapshots.length - 2; i >= 0; i--) {
     state = reduceHistory(state, { type: 'undo' });
     assert.equal(serialize(state.document), snapshots[i]);
@@ -50,7 +86,11 @@ test('every document mutation and replacement restores exactly through undo and 
 
 test('identical commits are no-ops and do not erase redo; new changes do', () => {
   const initial = createHistory(sample());
-  assert.equal(reduceHistory(initial, { type: 'commit', document: parseDiagram(serialize(initial.document)) }), initial);
+  const sameDocument = parseDiagram(serialize(initial.document));
+  assert.equal(
+    reduceHistory(initial, { type: 'commit', document: sameDocument }),
+    initial
+  );
   let state = reduceHistory(initial, { type: 'commit', document: renameDiagram(initial.document, 'Changed') });
   state = reduceHistory(state, { type: 'undo' });
   assert.equal(state.future.length, 1);
@@ -84,14 +124,14 @@ test('history retains exactly the latest 50 commits and isolates external docume
 test('mutations preserve metadata, viewport, unrelated arrays and stable IDs', () => {
   const original = sample();
   const moved = moveNode(original, 'a', { x: 1.125, y: -9.5 });
-  assert.deepEqual(moved.nodes[0].position, { x: 1.125, y: -9.5, note: 'manual' });
+  assert.deepEqual(nodeAt(moved).position, { x: 1.125, y: -9.5, note: 'manual' });
   assert.deepEqual(moved.nodes.slice(1), original.nodes.slice(1));
   assert.deepEqual(moved.edges, original.edges);
   assert.deepEqual(moved.viewport, original.viewport);
   const edited = editNode(moved, 'a', { label: 'New label' });
-  assert.deepEqual(edited.nodes[0].data, { ...original.nodes[0].data, label: 'New label' });
-  assert.deepEqual(edited.nodes[0].extra, original.nodes[0].extra);
-  assert.deepEqual(renameEdge(edited, 'ab', 'new').edges[0], { ...original.edges[0], label: 'new' });
+  assert.deepEqual(nodeAt(edited).data, { ...nodeAt(original).data, label: 'New label' });
+  assert.deepEqual(nodeAt(edited)['extra'], nodeAt(original)['extra']);
+  assert.deepEqual(renameEdge(edited, 'ab', 'new').edges[0], { ...edgeAt(original, 0), label: 'new' });
   assert.deepEqual(original, sample());
 });
 
@@ -101,7 +141,10 @@ test('node deletion removes incident connections only; repeated deletion is a hi
   assert.deepEqual(next.edges, [{ id: 'bc', source: 'b', target: 'c' }]);
   assert.deepEqual(next.nodes, doc.nodes.slice(1));
   const state = createHistory(next);
-  assert.equal(reduceHistory(state, { type: 'commit', document: removeElement(state.document, 'a', 'node') }), state);
+  assert.equal(
+    reduceHistory(state, { type: 'commit', document: removeElement(state.document, 'a', 'node') }),
+    state
+  );
 });
 
 test('duplicate connection gestures are no-ops; imported duplicates remain intact', () => {
@@ -125,7 +168,7 @@ test('invalid edits throw without mutating valid history or source', () => {
   assert.throws(() => editNode(state.document, 'a', { label: 'x'.repeat(161) }), /160/);
   assert.throws(() => renameEdge(state.document, 'missing', 'changed'), /no longer exists/);
   assert.throws(() => moveNode(state.document, 'missing', { x: 0, y: 0 }), /no longer exists/);
-  assert.throws(() => addNode(state.document, state.document.nodes[0]), /unique/);
+  assert.throws(() => addNode(state.document, nodeAt(state.document)), /unique/);
   assert.equal(JSON.stringify(state), before);
 });
 
@@ -166,11 +209,19 @@ test('malformed, unsupported and unavailable recovery data disables writes witho
     assert.equal(boot.document, null);
     assert.equal(boot.canWrite, false);
     assert.match(boot.message, /left untouched/);
-    const result = writeRecovery(source => { storage = source; }, sample(), boot.canWrite);
+    const result = writeRecovery(
+      (source) => {
+        storage = source;
+      },
+      sample(),
+      boot.canWrite
+    );
     assert.equal(result.saved, false);
     assert.equal(storage, stored);
   }
-  const denied = readRecovery(() => { throw new Error('Storage access denied'); });
+  const denied = readRecovery(() => {
+    throw new Error('Storage access denied');
+  });
   assert.equal(denied.canWrite, false);
   assert.match(denied.message, /Storage access denied/);
 });
@@ -178,17 +229,35 @@ test('malformed, unsupported and unavailable recovery data disables writes witho
 test('successful recovery writes reopen exactly; quota failures retain prior bytes and allow an explicit retry', () => {
   let storage = serialize(sample());
   const edited = editNode(sample(), 'a', { label: 'Changed' });
-  let result = writeRecovery(source => { storage = source; }, edited, true);
+  let result = writeRecovery(
+    (source) => {
+      storage = source;
+    },
+    edited,
+    true
+  );
   assert.equal(result.saved, true);
   assert.equal(result.canWrite, true);
   assert.deepEqual(readRecovery(() => storage).document, edited);
   const previous = storage;
-  result = writeRecovery(() => { throw new Error('Quota exceeded'); }, sample(), true);
+  result = writeRecovery(
+    () => {
+      throw new Error('Quota exceeded');
+    },
+    sample(),
+    true
+  );
   assert.equal(result.saved, false);
   assert.equal(result.canWrite, true);
   assert.match(result.message, /Quota exceeded/);
   assert.equal(storage, previous);
-  result = writeRecovery(source => { storage = source; }, sample(), result.canWrite);
+  result = writeRecovery(
+    (source) => {
+      storage = source;
+    },
+    sample(),
+    result.canWrite
+  );
   assert.equal(result.saved, true);
   assert.deepEqual(parseDiagram(storage), sample());
   result = writeRecovery(() => assert.fail('paused writes must not run'), sample(), false);
@@ -198,35 +267,44 @@ test('successful recovery writes reopen exactly; quota failures retain prior byt
   assert.equal(result.saved, false);
 });
 
-
 test('large histories respect a combined byte budget and retain immediate replacement undo', () => {
   let state = createHistory(sample());
-  const withinBudget = () => {
+  const withinBudget = (): void => {
     assert.ok(state.past.length + state.future.length <= HISTORY_LIMIT);
-    assert.ok([...state.past, ...state.future].reduce((sum, entry) => sum + entry.length * 2, 0) <= HISTORY_BYTE_LIMIT);
+    assert.ok(
+      [...state.past, ...state.future].reduce((sum, entry) => sum + entry.length * 2, 0) <= HISTORY_BYTE_LIMIT
+    );
   };
   for (let i = 0; i < 15; i++) {
-    state = reduceHistory(state, { type: 'commit', document: { ...sample(), title: String(i), largeMetadata: 'x'.repeat(1_000_000) } });
+    state = reduceHistory(state, {
+      type: 'commit',
+      document: { ...sample(), title: String(i), largeMetadata: 'x'.repeat(1_000_000) }
+    });
     withinBudget();
   }
   assert.ok(state.past.length < 15, 'byte cap trims before count cap for large documents');
   const previous = serialize(state.document);
-  state = reduceHistory(state, { type: 'commit', document: { ...sample(), title: 'Large replacement', largeMetadata: 'y'.repeat(4_000_000) } });
+  state = reduceHistory(state, {
+    type: 'commit',
+    document: { ...sample(), title: 'Large replacement', largeMetadata: 'y'.repeat(4_000_000) }
+  });
   withinBudget();
   assert.equal(state.past.at(-1), previous);
   state = reduceHistory(state, { type: 'undo' });
   withinBudget();
   assert.equal(serialize(state.document), previous);
-  assert.equal(parseDiagram(state.future.at(-1)!).title, 'Large replacement');
+  const future = state.future.at(-1);
+  assert.ok(future !== undefined);
+  assert.equal(parseDiagram(future).title, 'Large replacement');
   state = reduceHistory(state, { type: 'redo' });
   withinBudget();
   assert.equal(state.document.title, 'Large replacement');
-  while (state.past.length) {
+  while (state.past.length > 0) {
     state = reduceHistory(state, { type: 'undo' });
     withinBudget();
   }
   assert.ok(state.future.length > 0);
-  while (state.future.length) {
+  while (state.future.length > 0) {
     state = reduceHistory(state, { type: 'redo' });
     withinBudget();
   }

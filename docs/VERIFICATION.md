@@ -26,7 +26,7 @@ The production `dist/index.html` was copied unchanged to a local QA directory an
 
 - Direct `file://` opening was blocked by the cloud browser's URL security policy. No alternate route was used to bypass that restriction. The single-file structure is verified, but **offline double-click browser behavior remains unverified** and needs a supported local-file test before story 1 is closed.
 - Firefox, Safari, physical mobile devices, high-node-count rendering performance and real public hosting have not been tested.
-- Full-site CI and a manual-only Pages workflow are prepared; remote Actions execution and public deployment are not yet verified. Browser storage-denial/corrupt-entry/write-failure paths are covered by unit tests, not a forced browser configuration change. The 4.9 MB valid synthetic fixture saved successfully in Chromium, so it did not exercise an actual quota failure.
+- Full-site CI passed on both the pull request and merged main, as recorded below. Public Pages deployment remains unapproved and unverified. Browser storage-denial/corrupt-entry/write-failure paths are covered by unit tests, not a forced browser configuration change. The 4.9 MB valid synthetic fixture saved successfully in Chromium, so it did not exercise an actual quota failure.
 - Repository licensing remains an owner decision. No public reuse license or public deployment has been enabled.
 
 ## Story traceability at this increment
@@ -42,7 +42,7 @@ The production `dist/index.html` was copied unchanged to a local QA directory an
 | 7. Human–AI format | Model tests plus actual file/visual roundtrip passed. |
 | 8. Visual review | Exact edited source rendered and visually compared; workflow documented. |
 | 9. Git portability | Plain JSON source, stable serialization/order, generated output excluded from Git. |
-| 10. Full-site CI/CD | Full React CI and manual-only Pages workflows prepared, with source-commit metadata; production subpath/hash entry tested locally. Remote CI and authorized deployment verification remain pending. |
+| 10. Full-site CI/CD | Full React CI passed on the PR and merged main; its actual artifact was visually checked over HTTP. Manual-only Pages workflow and source-commit verification are ready; public deployment verification remains pending. |
 
 ## Local editor increment — actual Chromium checks
 
@@ -82,4 +82,20 @@ These are actual production-artifact HTTP browser checks. They do not remove the
 - Clean `npm ci` completed with the pinned Node/npm versions and lockfile. Full builds passed both without `SOURCE_COMMIT` (`local` metadata) and with a full SHA fixture; 37 tests, TypeScript, production bundling and artifact checks passed. Invalid provenance inputs are unit-tested.
 - Both workflow files passed actionlint 1.7.12, downloaded from its official release with the release checksum verified. This checks workflow syntax/expressions, not GitHub runner execution.
 - Served the unchanged production output at `/project-subpath/#diagram` in cloud Chromium. A fresh direct entry and reload now scroll to the mounted diagram, while a URL without the hash starts at the page introduction. Inspected all four cards, three labeled arrows and controls; the DOM metadata exactly matched the supplied test SHA. That fixture labels an uncommitted local QA build, not a deployed source revision.
-- No remote Actions run or Pages deployment has been performed for this increment yet. The manual publication input defaults to false, only `main` is eligible, and repository Pages enablement remains an owner-approved step. Deployed byte/SHA verification remains pending as described in `PUBLISHING.md`.
+- At the initial pre-publication review, remote Actions and Pages had not run. The completed CI results are recorded below. The manual publication input defaults to false, only `main` is eligible, and repository Pages enablement remains an owner-approved step. Deployed byte/SHA verification remains pending as described in `PUBLISHING.md`.
+
+
+## Verified remote CI results
+
+- [PR 5 build run 40500674025](https://github.com/nader-najjar/pure-diagramming/actions/runs/40500674025) completed successfully for feature head `35ddac1235345e28db575a143c8cf68e7f1f76b6`, testing merge commit `80cea4add8eb45f9baeb611dd653a977b8e1e6c3`. Clean install, all 37 tests, TypeScript, full React build, artifact checks and upload passed.
+- Downloaded artifact `12732616560` and verified its ZIP SHA-256 against GitHub's reported digest: `70ef83fa68097094be3a5ca2101dd39c81dd30caf192c1353c108dedbe17d740`. It contained exactly `index.html`; its embedded source matched the tested merge commit. HTML SHA-256: `08888732f1a9558e34fab6bd62303a084eb87a0f526d7b1b5e6aaef3f55f1c77`. After normalizing only that provenance meta value, its bytes matched the locally tested production artifact.
+- Opened that exact CI-produced HTML through the supported HTTP preview with `#diagram`. Confirmed the intended anchor position, four complete cards, three labeled arrows and editor controls. Exported and opened its actual PNG: all components, labels, arrowheads and styling were present and readable.
+- [Merged-main build run 40500978133](https://github.com/nader-najjar/pure-diagramming/actions/runs/40500978133) completed successfully for `8d14aac88fdacbfa2fb52553f98cc2e785b4220c`; every install/build/upload step passed and artifact `12732562185` was created. No Pages workflow was dispatched. Artifacts have 14-day retention; these IDs are historical evidence, not permanent distribution links.
+
+## Remaining acceptance gates
+
+1. **Offline viewing (stories 1 and 5):** the HTML is structurally self-contained and its HTTP behavior is verified, but the cloud browser blocks `file://` navigation. A supported local-file opening test is still required; no alternate route was used to bypass that policy. Firefox/Safari and a second physical device are not claimed tested.
+2. **Reuse rights (story 2):** the owner must choose the repository license. Dependency licenses and the absence of paid services do not independently grant rights to this project's source.
+3. **Public site (stories 1, 5 and 10):** owner approval is required to enable Pages and dispatch publication. Then verify the deployed URL, exact source commit/bytes, subpath/hash entry and actual rendering as documented in `PUBLISHING.md`.
+
+The editor, recovery, whole-image export and human–AI JSON workflow have the automated and actual Chromium evidence above, with the stated storage-failure/performance/browser limits. This record does not silently convert untested or unauthorized gates into passes.

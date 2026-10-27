@@ -1,0 +1,11 @@
+import assert from 'node:assert/strict';
+import { readFileSync, readdirSync } from 'node:fs';
+const directory = new URL('../dist/', import.meta.url);
+assert.deepEqual(readdirSync(directory), ['index.html'], 'The viewing artifact must be one self-contained HTML file.');
+const html = readFileSync(new URL('index.html', directory), 'utf8');
+assert.ok(html.includes('<script'), 'The React site must be bundled.');
+assert.ok(html.includes('<style'), 'Styles must be bundled.');
+assert.ok(!/<script\b[^>]*\bsrc\s*=/i.test(html), 'No external scripts may be required.');
+assert.ok(!/<link\b[^>]*\brel=["'](?:stylesheet|modulepreload)["']/i.test(html), 'No external style or module assets may be required.');
+assert.ok(!/@import\s/i.test(html), 'CSS must not import remote resources.');
+console.log('Standalone structure verified: dist/index.html. This is not a file:// browser test.');

@@ -1,4 +1,4 @@
-import { StrictMode, useRef, useState } from 'react';
+import { StrictMode, useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import '@xyflow/react/dist/style.css';
 import './style.css';
@@ -28,6 +28,10 @@ function downloadBlob(blob: Blob, filename: string) {
 }
 
 function App() {
+  // The anchor does not exist until React mounts the single-file app.
+  useEffect(() => {
+    if (location.hash === '#diagram') document.getElementById('diagram')?.scrollIntoView();
+  }, []);
   const workspace = useWorkspace(initial, `pure-diagramming:v1:${project.name}:${location.pathname}`);
   const { history, editing, status, setStatus } = workspace;
   const diagram = history.document;

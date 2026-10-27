@@ -4,7 +4,7 @@ Date: 2026-10-27. This records the viewer, local editor and export increments, *
 
 ## Automated author checks
 
-`npm run build` runs the exact Node/npm check, validates every bundled diagram, runs 36 unit tests, checks strict TypeScript, builds the complete React site, and asserts a single HTML output with inline JavaScript/styles and no external script/style imports. All passed.
+`npm run build` runs the exact Node/npm check, validates every bundled diagram, runs 37 unit tests, checks strict TypeScript, builds the complete React site, and asserts a single HTML output with inline JavaScript/styles and no external script/style imports. All passed.
 
 Tests include stable IDs/order, targeted AI label and connection edits, fractional human coordinates, unknown metadata at every JSON level, byte/count/text/depth limits, malformed data, unsupported versions/colors, invalid references, and wide-layout fitting bounds. Limits reject rather than truncate or clamp.
 
@@ -26,7 +26,7 @@ The production `dist/index.html` was copied unchanged to a local QA directory an
 
 - Direct `file://` opening was blocked by the cloud browser's URL security policy. No alternate route was used to bypass that restriction. The single-file structure is verified, but **offline double-click browser behavior remains unverified** and needs a supported local-file test before story 1 is closed.
 - Firefox, Safari, physical mobile devices, high-node-count rendering performance and real public hosting have not been tested.
-- CI/CD remains a subsequent increment. Browser storage-denial/corrupt-entry/write-failure paths are covered by unit tests, not a forced browser configuration change. The 4.9 MB valid synthetic fixture saved successfully in Chromium, so it did not exercise an actual quota failure.
+- Full-site CI and a manual-only Pages workflow are prepared; remote Actions execution and public deployment are not yet verified. Browser storage-denial/corrupt-entry/write-failure paths are covered by unit tests, not a forced browser configuration change. The 4.9 MB valid synthetic fixture saved successfully in Chromium, so it did not exercise an actual quota failure.
 - Repository licensing remains an owner decision. No public reuse license or public deployment has been enabled.
 
 ## Story traceability at this increment
@@ -42,7 +42,7 @@ The production `dist/index.html` was copied unchanged to a local QA directory an
 | 7. Human–AI format | Model tests plus actual file/visual roundtrip passed. |
 | 8. Visual review | Exact edited source rendered and visually compared; workflow documented. |
 | 9. Git portability | Plain JSON source, stable serialization/order, generated output excluded from Git. |
-| 10. Full-site CI/CD | Production subpath/hash entry tested locally; workflows and authorized deployment verification pending. |
+| 10. Full-site CI/CD | Full React CI and manual-only Pages workflows prepared, with source-commit metadata; production subpath/hash entry tested locally. Remote CI and authorized deployment verification remain pending. |
 
 ## Local editor increment — actual Chromium checks
 
@@ -76,3 +76,10 @@ All QA fixtures and browser downloads were illustrative and remained outside tra
 - Browser zoom exposed short edge-label wrapping in the PNG despite a single live line. The isolated capture now allows two pixels of width-rounding slack, capped by the original label limit. Rebuilt and opened the actual PNG at 175% browser zoom: short labels stayed on one line; a separate 160-character label export retained its full text, cards and arrows. The live source/layout was not changed.
 
 These are actual production-artifact HTTP browser checks. They do not remove the file:// verification limitation above. Firefox/Safari, physical devices and browser memory exhaustion are not claimed tested.
+
+## CI/CD preparation increment
+
+- Clean `npm ci` completed with the pinned Node/npm versions and lockfile. Full builds passed both without `SOURCE_COMMIT` (`local` metadata) and with a full SHA fixture; 37 tests, TypeScript, production bundling and artifact checks passed. Invalid provenance inputs are unit-tested.
+- Both workflow files passed actionlint 1.7.12, downloaded from its official release with the release checksum verified. This checks workflow syntax/expressions, not GitHub runner execution.
+- Served the unchanged production output at `/project-subpath/#diagram` in cloud Chromium. A fresh direct entry and reload now scroll to the mounted diagram, while a URL without the hash starts at the page introduction. Inspected all four cards, three labeled arrows and controls; the DOM metadata exactly matched the supplied test SHA. That fixture labels an uncommitted local QA build, not a deployed source revision.
+- No remote Actions run or Pages deployment has been performed for this increment yet. The manual publication input defaults to false, only `main` is eligible, and repository Pages enablement remains an owner-approved step. Deployed byte/SHA verification remains pending as described in `PUBLISHING.md`.

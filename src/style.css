@@ -119,6 +119,7 @@ button:focus-visible,a:focus-visible {
 
 .file-actions {
   display:flex;
+  flex-wrap:wrap;
   gap:9px;
   flex-shrink:0;
   padding-bottom:2px
@@ -398,7 +399,7 @@ button:focus-visible,a:focus-visible {
   }
 
   .file-actions button {
-    flex:1
+    flex:1 1 calc(50% - 5px)
   }
 
   .diagram-heading {

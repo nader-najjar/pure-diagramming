@@ -1,10 +1,10 @@
-# Verification record — viewer and local editor
+# Verification record — viewer, editor and exports
 
-Date: 2026-10-27. This records the viewer foundation and local editor increments, **not a claim that all user stories pass**.
+Date: 2026-10-27. This records the viewer, local editor and export increments, **not a claim that all user stories pass**.
 
 ## Automated author checks
 
-`npm run build` runs the exact Node/npm check, validates every bundled diagram, runs 26 unit tests, checks strict TypeScript, builds the complete React site, and asserts a single HTML output with inline JavaScript/styles and no external script/style imports. All passed.
+`npm run build` runs the exact Node/npm check, validates every bundled diagram, runs 36 unit tests, checks strict TypeScript, builds the complete React site, and asserts a single HTML output with inline JavaScript/styles and no external script/style imports. All passed.
 
 Tests include stable IDs/order, targeted AI label and connection edits, fractional human coordinates, unknown metadata at every JSON level, byte/count/text/depth limits, malformed data, unsupported versions/colors, invalid references, and wide-layout fitting bounds. Limits reject rather than truncate or clamp.
 
@@ -26,7 +26,7 @@ The production `dist/index.html` was copied unchanged to a local QA directory an
 
 - Direct `file://` opening was blocked by the cloud browser's URL security policy. No alternate route was used to bypass that restriction. The single-file structure is verified, but **offline double-click browser behavior remains unverified** and needs a supported local-file test before story 1 is closed.
 - Firefox, Safari, physical mobile devices, high-node-count rendering performance and real public hosting have not been tested.
-- Changed-document portable viewing export, PNG export and CI/CD are subsequent increments. Browser storage-denial/corrupt-entry/write-failure paths are covered by unit tests, not a forced browser configuration change. The 4.9 MB valid synthetic fixture saved successfully in Chromium, so it did not exercise an actual quota failure.
+- CI/CD remains a subsequent increment. Browser storage-denial/corrupt-entry/write-failure paths are covered by unit tests, not a forced browser configuration change. The 4.9 MB valid synthetic fixture saved successfully in Chromium, so it did not exercise an actual quota failure.
 - Repository licensing remains an owner decision. No public reuse license or public deployment has been enabled.
 
 ## Story traceability at this increment
@@ -37,8 +37,8 @@ The production `dist/index.html` was copied unchanged to a local QA directory an
 | 2. Reuse template | Project identity/example separated from engine; pinned toolchain and dependency notices; repository license pending. |
 | 3. Visual editing | Add, drag, connect (form and handles), label/style editing, deletion, Undo/Redo and staged Cancel checked in Chromium. |
 | 4. Predictable saving | Explicit source downloads, non-destructive invalid input, replacement confirmation, recovery Cancel/Resume and reload separation checked; storage failures unit-tested. |
-| 5. Share | Bundled viewer is self-contained; local file never silently becomes published example; changed-document portable export pending. |
-| 6. Image export | Not implemented in this slice. |
+| 5. Share | Bundled viewer is self-contained; local file never silently becomes published example; changed-document HTML export and recipient JSON roundtrip checked over HTTP; offline browser check remains blocked. |
+| 6. Image export | Actual whole-diagram PNGs visually inspected for example, zoomed/offscreen content and maximum-length labels; size-limit failure preserved source. |
 | 7. Human–AI format | Model tests plus actual file/visual roundtrip passed. |
 | 8. Visual review | Exact edited source rendered and visually compared; workflow documented. |
 | 9. Git portability | Plain JSON source, stable serialization/order, generated output excluded from Git. |
@@ -60,3 +60,19 @@ The full build passed after the editor changes and the adaptive connection-label
 - Repeated-connection regression: imported a four-node document with no edges, chose Review → Idea, clicked Connect twice, and downloaded the result. Exactly one Review → Idea edge existed; no default-pair edge appeared. From/To retained their choices across the commit. Deleting Review cleared only the missing From endpoint and disabled Connect; staged property Cancel still retained the original label.
 
 All QA fixtures and browser downloads were illustrative and remained outside tracked source. No public deployment or repository write-back happened through the editor.
+
+## Portable export increment — actual Chromium checks
+
+- Downloaded the production viewer's example PNG and opened the actual image. A first wrapper-based implementation produced a blank image; capturing the isolated viewport fixed it. The verified 2650 × 682 result contains all four complete cards, three labels and arrowheads, with readable text and styling.
+- Imported the exact human-edited roundtrip source with a further illustrative title/label change, literal angle brackets, unknown closing-script markup and Unicode line separators. Downloaded HTML, checked its inert embedded payload against the source, and opened that exact file through the supported HTTP preview at a different path. The changed title and literal label rendered, browser recovery remained unopened, and its downloaded JSON exactly matched the source including metadata and layout.
+- Exported PNG from the portable file under its network-blocking CSP. Zoomed until the first and last components were outside the visible canvas, exported again, then opened the actual PNG: all four components and arrows remained present. The live canvas transform string was unchanged before/after capture.
+- Exported a 160-character edge label extending beyond the cards' vertical bounds. The actual 2650 × 874 image retained the entire wrapped label and all cards/arrows.
+- A layout spanning x=-100,000 to x=100,000 produced an actionable PNG size-limit error rather than an unreadable downscale. Its subsequent JSON download exactly matched the imported source.
+- Re-exported HTML from the recipient viewing file successfully. The complete inline production bundle is also exercised by the final build's artifact check; testing only tiny synthetic JavaScript strings would not catch bundler integration issues.
+
+- A malformed version-2 embedded payload showed an explicit fallback/recovery error. Opening the valid source restored the intended diagram and cleared that error; PNG export then succeeded on the final capture implementation.
+
+- After the independent review found narrow-screen action overflow, verified all four file actions at a 322 CSS-pixel document width (Chromium window resizing plus 175% browser zoom): two rows, every button inside the document, and no horizontal overflow. Export PNG was usable there.
+- Browser zoom exposed short edge-label wrapping in the PNG despite a single live line. The isolated capture now allows two pixels of width-rounding slack, capped by the original label limit. Rebuilt and opened the actual PNG at 175% browser zoom: short labels stayed on one line; a separate 160-character label export retained its full text, cards and arrows. The live source/layout was not changed.
+
+These are actual production-artifact HTTP browser checks. They do not remove the file:// verification limitation above. Firefox/Safari, physical devices and browser memory exhaustion are not claimed tested.

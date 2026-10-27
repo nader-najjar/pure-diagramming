@@ -10,11 +10,11 @@ The repository's source and Actions artifacts also follow the repository's visib
 
 ## CI without deployment
 
-`.github/workflows/ci.yml` runs on pull requests, pushes to `main`, and manual dispatch. It installs the locked dependencies with the pinned Node/npm toolchain and runs **the full `npm run build`**, including diagram validation, tests, TypeScript and the complete single-file React build. It does not publish a website or change Pages settings.
+`.github/workflows/ci.yml` runs on pull requests, pushes to `main`, and manual dispatch. It uses pinned Bazelisk/Bazel, the Bazel-managed Node toolchain and committed dependency locks to run **the full `bazel build //...` and `bazel test //...`**, including diagram validation, coverage-enforced tests, strict TypeScript, lint, dependency/unused-code checks and the complete single-file React artifact contract. It does not publish a website or change Pages settings.
 
 Successful runs provide a `pure-diagramming-<commit>` artifact containing `index.html`, retained for 14 days. Download/unzip it through the Actions run page and share the HTML file itself with a recipient; the recipient does not need an account, terminal or Node. Downloading an Actions artifact requires GitHub access, so the Actions page is not the no-account viewing link. Direct offline opening still needs the browser verification recorded in [VERIFICATION.md](VERIFICATION.md).
 
-The workflow summary records the checked-out commit and HTML SHA-256. On pull requests this is GitHub's tested merge commit, not necessarily the feature branch's latest commit. The site's `pure-diagramming-source-commit` HTML meta tag records the same SHA. Local builds without `SOURCE_COMMIT` explicitly record `local`; setting the variable is a provenance label, not a signature or proof of a clean working tree.
+The workflow summary records the checked-out commit and HTML SHA-256. On pull requests this is GitHub's tested merge commit, not necessarily the feature branch's latest commit. The site's `pure-diagramming-source-commit` HTML meta tag records the same SHA. Local builds default to `local`. CI passes `--define=SOURCE_COMMIT="$SOURCE_COMMIT"` to both Bazel commands; this explicit action input prevents a cached artifact from silently retaining a different source label. For a labeled local build, pass a full 40-character SHA with the same flag to both commands. An ambient environment variable alone is not used. The label is not a signature or proof of a clean working tree.
 
 ## Explicitly authorized Pages publication
 
@@ -25,7 +25,7 @@ Once authorized:
 1. A repository administrator enables GitHub Pages with **GitHub Actions** as the publishing source in the repository settings. Check the plan/organization constraints first. Public repositories support Pages on GitHub Free; private repositories have additional plan and visibility constraints. No personal access token is needed by these workflows.
 2. Review the `github-pages` environment and its deployment branch/reviewer protection with the owner. This workflow is restricted to `main`; if a copied template uses a different default branch, update both workflows deliberately.
 3. In Actions, choose **Publish project site (manual)**, select `main`, and explicitly check the **publish** input. Its default is false. A different branch or an unchecked input skips the build/deploy jobs.
-4. The build repeats all normal checks, embeds the selected run's source SHA, and uploads the whole `dist` site. The dependent deploy job alone receives `pages: write` and `id-token: write`. `configure-pages` has `enablement: false`; an unconfigured site fails rather than silently changing repository settings.
+4. The build repeats all normal checks, embeds the selected run's source SHA, and uploads the whole `bazel-bin/dist` site. The dependent deploy job alone receives `pages: write` and `id-token: write`. `configure-pages` has `enablement: false`; an unconfigured site fails rather than silently changing repository settings.
 5. Follow the successful deployment's returned URL. Do not infer success from the upload step or assume a URL. Verify as below before sharing it.
 
 Actions are pinned to full upstream release SHAs. When updating them or the toolchain, inspect the official release and rerun the full build and workflow checks. CI uses read-only repository permissions and does not persist checkout credentials; it does not run untrusted pull-request code via `pull_request_target`.

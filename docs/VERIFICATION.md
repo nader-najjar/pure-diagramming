@@ -2,9 +2,19 @@
 
 Date: 2026-10-27. This records the viewer, editor, exports, CI and authorized public deployment, **not a claim that all user stories pass**.
 
-## Automated author checks
+## Bazel migration verification
 
-`npm run build` runs the exact Node/npm check, validates every bundled diagram, runs 37 unit tests, checks strict TypeScript, builds the complete React site, and asserts a single HTML output with inline JavaScript/styles and no external script/style imports. All passed.
+The current full-build entrypoints are `bazel build //...` and `bazel test //...`; the current artifact is `bazel-bin/dist/index.html`. Both passed on Linux with Bazel 9.2.0 and its pinned Node 24.22.1 toolchain. All eight Bazel test targets passed: strict TypeScript, zero-warning typed ESLint, dependency boundaries, unused-code/dependency checks, frozen manifest/lockfile consistency, diagram validation, unit tests and the single-file artifact contract.
+
+All 58 unit/component tests passed. Coverage across core logic and browser application code, including `App.tsx`, was 97.25% statements, 91.64% branches, 99.46% functions and 98.87% lines; all four enforce an 80% minimum. Only the thin startup/composition entrypoint is excluded. The Bazel-selected Node and TypeScript SDK reporting target was also run successfully. A clean rebuild and all eight test targets also passed with the workspace `node_modules` directory temporarily absent; the rebuilt HTML retained the exact SHA-256 below. A temporary manifest-only React version change was rejected by `//:lockfile_consistency` with `ERR_PNPM_OUTDATED_LOCKFILE`, then the manifest was restored exactly. The migrated build has not been deployed; the historical public-demo evidence below describes the previous release.
+
+The production artifact with SHA-256 `95d7bb6e604bf313e2519ca954d7176faae98713fb34c8ab129f42aac0e0db26` was copied unchanged into the supported managed cloud preview and checked in Chromium over HTTP. The four cards and three arrows rendered; title editing/Apply and Undo worked; a real JSON download semantically matched the canonical example; the HTML download opened as a portable snapshot with all four components; and the actual 2650 × 684 PNG showed all labels/cards/arrows without clipping. Direct `file://` behavior remains unverified; no blocked offline-browser route was retried.
+
+The documented dev target returned transformed application JavaScript over HTTP, and the preview target served bytes identical to the production HTML. `bazel run @pnpm -- --version` returned the pinned 10.20.0.
+
+## Historical npm-build author checks
+
+Before the Bazel migration, `npm run build` ran the exact Node/npm check, validated every bundled diagram, ran 37 unit tests, checked strict TypeScript, built the complete React site, and asserted a single HTML output with inline JavaScript/styles and no external script/style imports. All passed.
 
 Tests include stable IDs/order, targeted AI label and connection edits, fractional human coordinates, unknown metadata at every JSON level, byte/count/text/depth limits, malformed data, unsupported versions/colors, invalid references, and wide-layout fitting bounds. Limits reject rather than truncate or clamp.
 

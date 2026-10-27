@@ -11,28 +11,68 @@ A local-first React diagramming template. No account, API key, backend or paid s
 The initial view fits the complete diagram. Zoom in or expand **Read as text** to read a large diagram or use a small screen; drag the background to pan. **Open JSON** loads another diagram only in your browser. **Download JSON** requests a copy of the current editable document. **Download HTML** requests a standalone `diagram-view.html` containing the current diagram, all its metadata and the complete viewer/editor. **Export PNG** captures the entire rendered diagram at 2× resolution, regardless of pan/zoom. Opening a file does not upload it, update Git, or change what someone sees at a published link. The published page does not automatically load a private browser draft. Select **Edit diagram** to start a local workspace; if a recovery draft exists, choose whether to resume it or explicitly replace it with the current diagram. Browser recovery is not a portable file or repository save.
 
 - `diagrams/*.json`: canonical editable source; keep these in Git.
-- `dist/index.html`: generated, self-contained viewing file and complete React project site. It contains the bundled diagram, not a private file you subsequently open.
+- `bazel-bin/dist/index.html`: generated, self-contained viewing file and complete React project site. It contains the bundled diagram, not a private file you subsequently open.
 - `project.json`: project name, tagline and introductory description. With the required permission under [LICENSE](LICENSE), replace these and `diagrams/example.json` to reuse the example without editing the engine.
 
 The example is illustrative, not a verified real-world architecture.
 
 ## Develop and build
 
-Use **Node 24.22.1 and npm 11.9.0**, pinned by `.node-version`, `package.json` and the build's toolchain check. Provision that exact Node release with your version manager rather than relying on a machine's incidental default; it includes npm 11.9.0. For example, with an existing `nvm` installation: `nvm install 24.22.1 && nvm use 24.22.1`. Installing a toolchain is only for maintainers, never viewers.
+Install [Bazelisk](https://bazel.build/install/bazelisk), which selects **Bazel 9.2.0** from `.bazelversion`. Bazel downloads the pinned **Node 24.22.1** toolchain and resolves the locked JavaScript dependencies; no separate system Node, npm or pnpm installation is needed for the build. Build tools are only for maintainers, never viewers.
 
 ```sh
-npm ci
-npm run build
+bazel build //...
+bazel test //...
 ```
 
-`npm run build` is the **full documented build**: exact-toolchain check, validation of every `diagrams/*.json`, all unit tests, strict TypeScript checking, the complete production site, and a structural single-file artifact check. It produces `dist/index.html`. The single-file build deliberately trades cache granularity for an artifact that opens directly from disk and works at a hosting subpath.
+Together these commands are the **full documented build**. Bazel owns the build graph, tools and dependencies rather than wrapping a package-manager build script. The test targets validate every `diagrams/*.json`, run all unit tests with 80% statements/branches/functions/lines coverage thresholds, enforce strict TypeScript, zero-warning ESLint, dependency boundaries, unused-code checks and frozen manifest/lockfile consistency, and verify the complete production artifact. Coverage excludes only the thin React startup/composition entrypoint; `App.tsx`, browser adapters and core logic are all measured.
+
+The output is `bazel-bin/dist/index.html`. It remains a self-contained React project site, intentionally trading cache granularity for a file that can be shared independently and hosted at a subpath. The artifact-contract test checks inline JavaScript/styles, absence of external script/style imports, source provenance, and embedded-document roundtripping with the real production assets. Structural checks do not replace browser QA.
 
 ```sh
-npm run dev      # local development only
-npm run preview  # inspect the production site over HTTP
+bazel run //:dev      # local development only
+bazel run //:preview  # inspect the production site over HTTP
 ```
 
-For offline QA, open the actual `dist/index.html` directly in a browser. For project-subpath QA, serve a parent directory containing the build and visit that subdirectory; don't assume a dev-server pass proves production paths work. No deployment is performed by these commands.
+The Bazel run targets use declared source snapshots; restart `bazel run //:dev` after source edits to refresh that snapshot.
+
+For offline QA, open the actual `bazel-bin/dist/index.html` directly in a supported browser. For project-subpath QA, serve a parent directory containing the build and visit that subdirectory; do not assume a dev-server pass proves production paths work. No deployment is performed by these commands.
+
+### Build and source boundaries
+
+- `//:core`: document model, editing operations, portable-source handling and view/image calculations; it cannot import browser adapters or the entrypoint.
+- `//:browser`: React components, browser workspace recovery and PNG export adapters.
+- `//:entrypoint`: browser startup and project/example composition.
+- `//:site`: Vite's single-file production output, with explicitly declared sources and dependencies.
+- `//:typecheck`, `//:lint`, `//:dependency_boundaries`, `//:unused_code`, `//:unit_tests`, `//:validate_diagrams`, `//:artifact_contract`, `//:lockfile_consistency`: independently addressable quality gates, all included in `bazel test //...`.
+
+Vite/Rolldown and the test/unused-code resolvers use native filesystem paths. Small Node adapters materialize only declared inputs before invoking these tools, retaining sandboxing rather than running an ambient package-manager build. Knip’s `dependency-cruiser` exception identifies the executable used directly by the Bazel dependency-boundary target. TypeScript is pinned to 6.0.3, matching the legacy template’s supported typed-ESLint range.
+
+### IDE toolchain paths
+
+Bazel builds do not populate the source-root `node_modules` directory. For IDE module resolution on a fresh checkout, materialize the same locked dependencies with the Bazel-managed package manager first (this is an IDE preparation step, not a build prerequisite):
+
+```sh
+bazel run @pnpm -- --dir "$PWD" install --frozen-lockfile
+bazel run //:print_node_and_tsdk_paths
+```
+
+Use the reported Node executable as your IDE's Node interpreter and the reported TypeScript SDK directory as its TypeScript installation. These paths come from the same Bazel-selected toolchain and locked TypeScript dependency used by the build, not a machine-global installation. Re-run the command after updating either toolchain or clearing Bazel's downloaded repositories. Keep your existing project/workspace settings; neither this command nor the build edits IDE settings.
+
+### Dependency and toolchain updates
+
+Use the Bazel-managed package manager, not hand-edited dependency entries or global package-manager installs. From the repository root:
+
+```sh
+bazel run @pnpm -- --dir "$PWD" add --save-exact <package>@<version>
+bazel run @pnpm -- --dir "$PWD" add --save-dev --save-exact <package>@<version>
+bazel run @pnpm -- --dir "$PWD" remove <package>
+bazel mod deps --lockfile_mode=update
+bazel build //...
+bazel test //...
+```
+
+Review `package.json`, `pnpm-lock.yaml` and `MODULE.bazel.lock` together. Normal builds require the committed Bazel lockfile to remain current. Update Bazel in `.bazelversion`; update Bazel rules and Node/pnpm toolchain versions in `MODULE.bazel`, keeping the Node/package-manager declarations in `package.json` aligned. Toolchain or rules updates also require regenerating the Bazel lockfile and running the full build. The frontend stays browser-only: no server, container, Lambda or cloud SDK is added just to copy a service template.
 
 ## Source contract
 
@@ -46,6 +86,6 @@ GitHub Actions runs the full project build on pull requests and `main`, then mak
 
 ## Dependencies and licensing
 
-Runtime: React and React DOM (MIT), React Flow / `@xyflow/react` (MIT), `html-to-image` 1.11.11 (MIT). Build: Vite (MIT), `vite-plugin-singlefile` (MIT), TypeScript (Apache-2.0) and the listed type packages (MIT). Exact versions and transitive dependencies are recorded in `package-lock.json`; dependency license terms remain applicable.
+Runtime: React and React DOM (MIT), React Flow / `@xyflow/react` (MIT), `html-to-image` 1.11.11 (MIT). Build: Vite (MIT), `vite-plugin-singlefile` (MIT), TypeScript (Apache-2.0) and the listed type packages (MIT). Exact versions and transitive dependencies are recorded in `pnpm-lock.yaml`; Bazel modules are locked in `MODULE.bazel.lock`; dependency license terms remain applicable.
 
 **Repository terms: all rights reserved**, matching the owner's other Pure repositories. See [LICENSE](LICENSE): use, modification and redistribution require the copyright holder's prior written permission, subject to the exceptions stated there. This is not an open-source license; dependency licenses do not grant rights to the repository's own material. The hosted demo requires no paid service or API key.

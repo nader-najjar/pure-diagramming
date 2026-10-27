@@ -1,5 +1,7 @@
 # Build and publish the complete project site
 
+The synthetic example is published at [the project demo](https://nader-najjar.github.io/pure-diagramming/#diagram). Its deployment evidence is recorded in [VERIFICATION.md](VERIFICATION.md). Publication remains manual; merging source changes does not redeploy the site. Reusing repository material is subject to [LICENSE](../LICENSE).
+
 ## What becomes public
 
 The project site bundles `project.json`, `diagrams/example.json`, and the React viewer/editor. **Every field in the bundled document, including unknown metadata, is public in the HTML.** Review those files for sensitive information before any publication. Other JSON files are validated during the build but are not automatically bundled. Imported local files and browser recovery drafts are not uploaded by either workflow.

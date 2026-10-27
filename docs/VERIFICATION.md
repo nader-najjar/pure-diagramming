@@ -1,6 +1,6 @@
 # Verification record — viewer, editor and exports
 
-Date: 2026-10-27. This records the viewer, local editor and export increments, **not a claim that all user stories pass**.
+Date: 2026-10-27. This records the viewer, editor, exports, CI and authorized public deployment, **not a claim that all user stories pass**.
 
 ## Automated author checks
 
@@ -12,7 +12,7 @@ Vite reports that React Flow's `use client` directive is not preserved; this bro
 
 ## Actual cloud Chromium checks
 
-The production `dist/index.html` was copied unchanged to a local QA directory and served through the supported managed preview daemon. No public deployment was performed.
+The production `dist/index.html` was copied unchanged to a local QA directory and served through the supported managed preview daemon. Those initial checks preceded the authorized public deployment recorded below.
 
 - Desktop render inspected: four complete cards, three labeled arrows, correct arrow direction and no overlapping example cards.
 - Downloaded actual JSON through the UI; the downloaded document exactly matched `diagrams/example.json`.
@@ -25,16 +25,16 @@ The production `dist/index.html` was copied unchanged to a local QA directory an
 ## Verification limits
 
 - Direct `file://` opening was blocked by the cloud browser's URL security policy. No alternate route was used to bypass that restriction. The single-file structure is verified, but **offline double-click browser behavior remains unverified** and needs a supported local-file test before story 1 is closed.
-- Firefox, Safari, physical mobile devices, high-node-count rendering performance and real public hosting have not been tested.
-- Full-site CI passed on both the pull request and merged main, as recorded below. Public Pages deployment remains unapproved and unverified. Browser storage-denial/corrupt-entry/write-failure paths are covered by unit tests, not a forced browser configuration change. The 4.9 MB valid synthetic fixture saved successfully in Chromium, so it did not exercise an actual quota failure.
-- Repository licensing remains an owner decision. No public reuse license or public deployment has been enabled.
+- Firefox, Safari, physical mobile devices and high-node-count rendering performance have not been tested.
+- Full-site CI passed on both the pull request and merged main, as recorded below. The authorized public Pages deployment and exact deployed bytes were verified as recorded below. Browser storage-denial/corrupt-entry/write-failure paths are covered by unit tests, not a forced browser configuration change. The 4.9 MB valid synthetic fixture saved successfully in Chromium, so it did not exercise an actual quota failure.
+- The owner chose the all-rights-reserved notice in [LICENSE](../LICENSE), copied unchanged from pure-java. This documents the terms but does not grant general public reuse permission.
 
 ## Story traceability at this increment
 
 | Story | Evidence / remaining work |
 | --- | --- |
-| 1. Immediate viewing | Production HTTP view and fit tested; offline browser test blocked as above. |
-| 2. Reuse template | Project identity/example separated from engine; pinned toolchain and dependency notices; repository license pending. |
+| 1. Immediate viewing | Public no-account project-site view, fit and direct hash entry tested; offline browser test blocked as above. |
+| 2. Reuse template | Project identity/example separated from engine; pinned toolchain and dependency notices; owner-selected all-rights-reserved terms documented (reuse requires permission). |
 | 3. Visual editing | Add, drag, connect (form and handles), label/style editing, deletion, Undo/Redo and staged Cancel checked in Chromium. |
 | 4. Predictable saving | Explicit source downloads, non-destructive invalid input, replacement confirmation, recovery Cancel/Resume and reload separation checked; storage failures unit-tested. |
 | 5. Share | Bundled viewer is self-contained; local file never silently becomes published example; changed-document HTML export and recipient JSON roundtrip checked over HTTP; offline browser check remains blocked. |
@@ -42,7 +42,7 @@ The production `dist/index.html` was copied unchanged to a local QA directory an
 | 7. Human–AI format | Model tests plus actual file/visual roundtrip passed. |
 | 8. Visual review | Exact edited source rendered and visually compared; workflow documented. |
 | 9. Git portability | Plain JSON source, stable serialization/order, generated output excluded from Git. |
-| 10. Full-site CI/CD | Full React CI passed on the PR and merged main; its actual artifact was visually checked over HTTP. Manual-only Pages workflow and source-commit verification are ready; public deployment verification remains pending. |
+| 10. Full-site CI/CD | Full React CI passed on the PR and merged main; its actual artifact was visually checked over HTTP. Manual Pages deployment passed; deployed HTML exactly matches its artifact and source SHA, with actual public browser checks below. |
 
 ## Local editor increment — actual Chromium checks
 
@@ -82,7 +82,7 @@ These are actual production-artifact HTTP browser checks. They do not remove the
 - Clean `npm ci` completed with the pinned Node/npm versions and lockfile. Full builds passed both without `SOURCE_COMMIT` (`local` metadata) and with a full SHA fixture; 37 tests, TypeScript, production bundling and artifact checks passed. Invalid provenance inputs are unit-tested.
 - Both workflow files passed actionlint 1.7.12, downloaded from its official release with the release checksum verified. This checks workflow syntax/expressions, not GitHub runner execution.
 - Served the unchanged production output at `/project-subpath/#diagram` in cloud Chromium. A fresh direct entry and reload now scroll to the mounted diagram, while a URL without the hash starts at the page introduction. Inspected all four cards, three labeled arrows and controls; the DOM metadata exactly matched the supplied test SHA. That fixture labels an uncommitted local QA build, not a deployed source revision.
-- At the initial pre-publication review, remote Actions and Pages had not run. The completed CI results are recorded below. The manual publication input defaults to false, only `main` is eligible, and repository Pages enablement remains an owner-approved step. Deployed byte/SHA verification remains pending as described in `PUBLISHING.md`.
+- At the initial pre-publication review, remote Actions and Pages had not run. The completed CI results are recorded below. The manual publication input defaults to false, only `main` is eligible, and repository Pages enablement remains an owner-approved step. The subsequently authorized deployment and byte/SHA verification are recorded in the public release section below.
 
 
 ## Verified remote CI results
@@ -90,12 +90,25 @@ These are actual production-artifact HTTP browser checks. They do not remove the
 - [PR 5 build run 40500674025](https://github.com/nader-najjar/pure-diagramming/actions/runs/40500674025) completed successfully for feature head `35ddac1235345e28db575a143c8cf68e7f1f76b6`, testing merge commit `80cea4add8eb45f9baeb611dd653a977b8e1e6c3`. Clean install, all 37 tests, TypeScript, full React build, artifact checks and upload passed.
 - Downloaded artifact `12732616560` and verified its ZIP SHA-256 against GitHub's reported digest: `70ef83fa68097094be3a5ca2101dd39c81dd30caf192c1353c108dedbe17d740`. It contained exactly `index.html`; its embedded source matched the tested merge commit. HTML SHA-256: `08888732f1a9558e34fab6bd62303a084eb87a0f526d7b1b5e6aaef3f55f1c77`. After normalizing only that provenance meta value, its bytes matched the locally tested production artifact.
 - Opened that exact CI-produced HTML through the supported HTTP preview with `#diagram`. Confirmed the intended anchor position, four complete cards, three labeled arrows and editor controls. Exported and opened its actual PNG: all components, labels, arrowheads and styling were present and readable.
-- [Merged-main build run 40500978133](https://github.com/nader-najjar/pure-diagramming/actions/runs/40500978133) completed successfully for `8d14aac88fdacbfa2fb52553f98cc2e785b4220c`; every install/build/upload step passed and artifact `12732562185` was created. No Pages workflow was dispatched. Artifacts have 14-day retention; these IDs are historical evidence, not permanent distribution links.
+- [Merged-main build run 40500978133](https://github.com/nader-najjar/pure-diagramming/actions/runs/40500978133) completed successfully for `8d14aac88fdacbfa2fb52553f98cc2e785b4220c`; every install/build/upload step passed and artifact `12732562185` was created. No Pages workflow was dispatched by that CI run. Artifacts have 14-day retention; these IDs are historical evidence, not permanent distribution links.
 
-## Remaining acceptance gates
+## Acceptance gates after public release
 
 1. **Offline viewing (stories 1 and 5):** the HTML is structurally self-contained and its HTTP behavior is verified, but the cloud browser blocks `file://` navigation. A supported local-file opening test is still required; no alternate route was used to bypass that policy. Firefox/Safari and a second physical device are not claimed tested.
-2. **Reuse rights (story 2):** the owner must choose the repository license. Dependency licenses and the absence of paid services do not independently grant rights to this project's source.
-3. **Public site (stories 1, 5 and 10):** owner approval is required to enable Pages and dispatch publication. Then verify the deployed URL, exact source commit/bytes, subpath/hash entry and actual rendering as documented in `PUBLISHING.md`.
+2. **Reuse rights (story 2), resolved:** the owner selected the all-rights-reserved notice in `LICENSE`. Dependency licenses and the absence of paid services do not independently grant rights to this project's source.
+3. **Public site (stories 1, 5 and 10), verified:** owner approval, Pages enablement, full-site deployment and deployed URL/source/byte/browser checks are recorded below. The offline criterion remains unverified, as stated in item 1.
 
 The editor, recovery, whole-image export and human–AI JSON workflow have the automated and actual Chromium evidence above, with the stated storage-failure/performance/browser limits. This record does not silently convert untested or unauthorized gates into passes.
+
+## Authorized public release — 2026-10-27
+
+The owner approved public Pages hosting of the synthetic example and selected the same all-rights-reserved notice as [pure-java](https://github.com/nader-najjar/pure-java/blob/main/LICENSE). `LICENSE` copies that notice unchanged, including Copyright © 2026 Nader Najjar. Dependency terms remain separate; this does not make the repository open source.
+
+- Enabled Pages with GitHub Actions as its source and explicitly dispatched the existing manual workflow on `main`. [Run 40525157570](https://github.com/nader-najjar/pure-diagramming/actions/runs/40525157570) passed its full build and deployment jobs. No automatic deployment trigger or custom domain was added.
+- Source: `8d14aac88fdacbfa2fb52553f98cc2e785b4220c`. The later acceptance/license documentation does not change the deployed application. Published URL returned by the deployment: <https://nader-najjar.github.io/pure-diagramming/>.
+- Downloaded the run's `github-pages` artifact (ID `12742853049`), checked ZIP SHA-256 `2bcc97b7f9155dac16c0cdae277d47a6508f984774c666d8d6c566a822344287`, and inspected its tar: only `index.html`. The deployed HTTPS response is byte-for-byte identical to that HTML. Its SHA-256 is `7e4ab96bd4ab89e83172bea6bcf8aacc7630462e049e9c4620a1172428ede857`, matching the workflow summary, and its source meta tag is the exact SHA above.
+- Actual cloud Chromium opened the public project-subpath URL without an application login. Inspected all four cards, three labeled directed arrows, styling and controls. Direct `#diagram` reload placed the diagram at approximately 16 CSS pixels from the viewport top. The page did not auto-open browser recovery.
+- Downloaded JSON from the public UI and compared its complete semantics with `diagrams/example.json`: exact equality. Entered Edit, applied an illustrative title change, undid it to restore the example, and returned to view-only mode. No diagram edits were uploaded.
+- Downloaded the public page's actual 2650 × 682 PNG and opened the image: complete cards, labels and arrowheads, matching the rendered example. Downloaded its HTML, checked the embedded document exactly against source, opened that exact file through the supported private HTTP preview at a separate path, and downloaded its JSON: exact semantic equality again. The recipient view started without browser recovery.
+
+These checks close the public deployment gate, not the blocked local-file gate. No private diagrams were published. Offline `file://`, other browser engines and physical-device verification retain the limitations above.

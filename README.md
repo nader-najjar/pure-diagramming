@@ -40,6 +40,10 @@ See [document format](docs/DOCUMENT_FORMAT.md). Unknown JSON fields are retained
 
 Before handing off a changed diagram: identify the exact JSON file, validate it, render it, inspect labels/overlaps/clipping/arrow meaning, and iterate. Schema validation alone is not visual review. Preserve before/after renders for meaningful visual changes. Use **Edit diagram** for visual changes or **Edit JSON** for a staged source replacement. Apply commits a form; Cancel leaves the document unchanged. Undo/Redo restore up to 50 changes within a 25 MB history budget in the current session; closing the page loses that history. Download JSON before handing work to another person or AI. See [editing and recovery](docs/EDITOR_STATE.md) for limits and failure behavior, and [sharing and exports](docs/EXPORTS.md) for viewing-file privacy, image limits and visual checks.
 
+## CI and optional publication
+
+GitHub Actions runs the full project build on pull requests and `main`, then makes the single HTML file available as a downloadable artifact. The separate Pages workflow is **manual-only, defaults to no publication, and does not enable hosting**. Review bundled content and obtain owner approval before enabling or dispatching Pages. See [publishing and source-commit verification](docs/PUBLISHING.md).
+
 ## Dependencies and licensing
 
 Runtime: React and React DOM (MIT), React Flow / `@xyflow/react` (MIT), `html-to-image` 1.11.11 (MIT). Build: Vite (MIT), `vite-plugin-singlefile` (MIT), TypeScript (Apache-2.0) and the listed type packages (MIT). Exact versions and transitive dependencies are recorded in `package-lock.json`; dependency license terms remain applicable.

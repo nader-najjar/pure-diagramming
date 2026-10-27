@@ -1,10 +1,10 @@
-# Verification record — document viewer foundation
+# Verification record — viewer and local editor
 
-Date: 2026-10-27. This is evidence for the first implementation slice, **not a claim that all user stories pass**.
+Date: 2026-10-27. This records the viewer foundation and local editor increments, **not a claim that all user stories pass**.
 
 ## Automated author checks
 
-`npm run build` runs the exact Node/npm check, validates every bundled diagram, runs 12 unit tests, checks strict TypeScript, builds the complete React site, and asserts a single HTML output with inline JavaScript/styles and no external script/style imports. All passed.
+`npm run build` runs the exact Node/npm check, validates every bundled diagram, runs 26 unit tests, checks strict TypeScript, builds the complete React site, and asserts a single HTML output with inline JavaScript/styles and no external script/style imports. All passed.
 
 Tests include stable IDs/order, targeted AI label and connection edits, fractional human coordinates, unknown metadata at every JSON level, byte/count/text/depth limits, malformed data, unsupported versions/colors, invalid references, and wide-layout fitting bounds. Limits reject rather than truncate or clamp.
 
@@ -26,7 +26,7 @@ The production `dist/index.html` was copied unchanged to a local QA directory an
 
 - Direct `file://` opening was blocked by the cloud browser's URL security policy. No alternate route was used to bypass that restriction. The single-file structure is verified, but **offline double-click browser behavior remains unverified** and needs a supported local-file test before story 1 is closed.
 - Firefox, Safari, physical mobile devices, high-node-count rendering performance and real public hosting have not been tested.
-- This slice is read-only. Visual editing/history/recovery, portable export of a locally changed document, PNG export and CI/CD are subsequent increments.
+- Changed-document portable viewing export, PNG export and CI/CD are subsequent increments. Browser storage-denial/corrupt-entry/write-failure paths are covered by unit tests, not a forced browser configuration change. The 4.9 MB valid synthetic fixture saved successfully in Chromium, so it did not exercise an actual quota failure.
 - Repository licensing remains an owner decision. No public reuse license or public deployment has been enabled.
 
 ## Story traceability at this increment
@@ -35,11 +35,28 @@ The production `dist/index.html` was copied unchanged to a local QA directory an
 | --- | --- |
 | 1. Immediate viewing | Production HTTP view and fit tested; offline browser test blocked as above. |
 | 2. Reuse template | Project identity/example separated from engine; pinned toolchain and dependency notices; repository license pending. |
-| 3. Visual editing | Not implemented in this slice. |
-| 4. Predictable saving | Explicit source downloads and non-destructive invalid import tested; editing/recovery pending. |
+| 3. Visual editing | Add, drag, connect (form and handles), label/style editing, deletion, Undo/Redo and staged Cancel checked in Chromium. |
+| 4. Predictable saving | Explicit source downloads, non-destructive invalid input, replacement confirmation, recovery Cancel/Resume and reload separation checked; storage failures unit-tested. |
 | 5. Share | Bundled viewer is self-contained; local file never silently becomes published example; changed-document portable export pending. |
 | 6. Image export | Not implemented in this slice. |
 | 7. Human–AI format | Model tests plus actual file/visual roundtrip passed. |
 | 8. Visual review | Exact edited source rendered and visually compared; workflow documented. |
 | 9. Git portability | Plain JSON source, stable serialization/order, generated output excluded from Git. |
 | 10. Full-site CI/CD | Production subpath/hash entry tested locally; workflows and authorized deployment verification pending. |
+
+## Local editor increment — actual Chromium checks
+
+The full build passed after the editor changes and the adaptive connection-label fix. Browser QA used the unchanged production artifact through the same managed HTTP preview, not the development bundle.
+
+- Entered Edit explicitly; initial published view did not open browser recovery. Staged a component edit and canceled it: label and history were unchanged. Applied label, description and color together, clicked Apply again, then one Undo restored all three original fields; Redo restored the edit.
+- Renamed the diagram, added a component, connected it through the From/To form, and repeated that connection without creating another edge. Dragged the component; one Undo restored the complete gesture and Redo restored the fractional final coordinates. Downloaded the actual source and inspected its stable IDs, endpoints and coordinates.
+- Renamed and deleted a connection, then restored it with Undo. Deleted a component with two incident edges; all three disappeared together and Undo restored them. Connected release to idea using the actual canvas handles and observed the new directed edge.
+- Reset confirmation Cancel retained the current five-node document; Apply replaced it with the four-node example and Undo restored the prior title, content and edges. Invalid version-2 text in Edit JSON was rejected in the modal; Cancel retained the current document.
+- Imported the synthetic metadata/fractional-coordinate fixture, canceled its replacement, imported the same file again and applied it. Edited its title visually, downloaded it, and compared complete JSON objects: exact equality except the requested title change. This preserves IDs, order, fractional positions, viewport and unknown metadata.
+- Reload after a requested download showed the bundled example, never the private draft. Edit offered the named recovery draft; Cancel kept the example and a second Edit → Resume restored the named draft. The UI distinguished requested downloads, browser recovery and unchanged repository state.
+- A maximum 160-character edge label initially extended beneath adjacent cards. After constraining forward-route labels to their available horizontal gap, rebuilt and inspected the actual render: the full label wrapped between the cards without being hidden. Canonical positions were unchanged. Arbitrary overlapping human layouts are not automatically rearranged; reverse/vertical routes retain the normal bounded label width.
+- Narrow Chromium window (526 CSS pixels, 511-pixel document width): inspector stacked below the canvas, form controls and recovery text remained readable without horizontal document overflow, and a title edit applied successfully. Fit View remained available after resize. Physical touch interaction was not tested.
+
+- Repeated-connection regression: imported a four-node document with no edges, chose Review → Idea, clicked Connect twice, and downloaded the result. Exactly one Review → Idea edge existed; no default-pair edge appeared. From/To retained their choices across the commit. Deleting Review cleared only the missing From endpoint and disabled Connect; staged property Cancel still retained the original label.
+
+All QA fixtures and browser downloads were illustrative and remained outside tracked source. No public deployment or repository write-back happened through the editor.

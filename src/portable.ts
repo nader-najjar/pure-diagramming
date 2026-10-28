@@ -88,7 +88,7 @@ export function createPortableHtml(document: Diagram, assets: PortableAssets): s
 <meta http-equiv="Content-Security-Policy" content="${escapeHtml(CSP)}"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <meta name="color-scheme" content="light"/>
-<title>${escapeHtml(document.title || 'Untitled diagram')} — Pure Diagramming</title>
+<title>${escapeHtml(document.title || 'Untitled diagram')} — Pure Schematic</title>
 ${assets.styles.map((style) => `<style data-pure-diagram-style>${style}</style>`).join('\n')}
 </head><body><div id="root"></div>
 <noscript>${

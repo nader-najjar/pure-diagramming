@@ -38,7 +38,7 @@ jobs:
           SOURCE_COMMIT: ${{ github.sha }}
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: pure-diagramming-${{ github.sha }}
+          name: pure-schematic-${{ github.sha }}
           path: bazel-bin/dist/index.html
           if-no-files-found: error
           retention-days: 14

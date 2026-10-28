@@ -2,6 +2,10 @@
 
 Date: 2026-10-27. This records the viewer, editor, exports, CI and authorized public deployment, **not a claim that all user stories pass**.
 
+## Repository rename — 2026-10-28
+
+The repository is now `nader-najjar/pure-schematic`, retaining repository ID `1435066681`. Cloud Chromium opened <https://nader-najjar.github.io/pure-schematic/#diagram> and showed the existing Pure Diagramming release with four components and three connections. No deployment was dispatched for the rename. Historical URLs and release evidence below are preserved as recorded; the source branding update requires a separately authorized publication before it appears on the live site. Browser recovery retains its previous project namespace through `project.json`’s `recoveryName`, preserving drafts at the same URL path across the display-name change. Drafts at the former URL path are not automatically migrated; exported JSON remains portable. The existing `pure-diagramming-source-commit` provenance key is retained for compatibility.
+
 ## Bazel migration verification
 
 The current full-build entrypoints are `bazel build //...` and `bazel test //...`; the current artifact is `bazel-bin/dist/index.html`. Both passed on Linux with Bazel 9.2.0 and its pinned Node 24.22.1 toolchain. All eight Bazel test targets passed: strict TypeScript, zero-warning typed ESLint, dependency boundaries, unused-code/dependency checks, frozen manifest/lockfile consistency, diagram validation, unit tests and the single-file artifact contract.

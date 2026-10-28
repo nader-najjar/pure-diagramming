@@ -1,4 +1,4 @@
-# Pure Diagramming
+# Pure Schematic
 
 A local-first React diagramming template. No account, API key, backend or paid service is needed to view a diagram.
 
@@ -6,13 +6,13 @@ A local-first React diagramming template. No account, API key, backend or paid s
 
 ## View — no terminal needed
 
-[Open the synthetic demo](https://nader-najjar.github.io/pure-diagramming/#diagram) — no account or installation. You can also double-click a supplied `index.html` portable viewer. The complete viewer is bundled into that one HTML file; it requires no local server, network connection or installation. The hosted demo is verified in Chromium. Direct offline opening remains unverified because the cloud browser blocks `file://`; see [verification limits](docs/VERIFICATION.md).
+[Open the synthetic demo](https://nader-najjar.github.io/pure-schematic/#diagram) — no account or installation. You can also double-click a supplied `index.html` portable viewer. The complete viewer is bundled into that one HTML file; it requires no local server, network connection or installation. The hosted demo is verified in Chromium. Direct offline opening remains unverified because the cloud browser blocks `file://`; see [verification limits](docs/VERIFICATION.md).
 
 The initial view fits the complete diagram. Zoom in or expand **Read as text** to read a large diagram or use a small screen; drag the background to pan. **Open JSON** loads another diagram only in your browser. **Download JSON** requests a copy of the current editable document. **Download HTML** requests a standalone `diagram-view.html` containing the current diagram, all its metadata and the complete viewer/editor. **Export PNG** captures the entire rendered diagram at 2× resolution, regardless of pan/zoom. Opening a file does not upload it, update Git, or change what someone sees at a published link. The published page does not automatically load a private browser draft. Select **Edit diagram** to start a local workspace; if a recovery draft exists, choose whether to resume it or explicitly replace it with the current diagram. Browser recovery is not a portable file or repository save.
 
 - `diagrams/*.json`: canonical editable source; keep these in Git.
 - `bazel-bin/dist/index.html`: generated, self-contained viewing file and complete React project site. It contains the bundled diagram, not a private file you subsequently open.
-- `project.json`: project name, tagline and introductory description. With the required permission under [LICENSE](LICENSE), replace these and `diagrams/example.json` to reuse the example without editing the engine.
+- `project.json`: project name, tagline and introductory description. `recoveryName` keeps the existing browser-recovery namespace stable across display-name changes; choose a distinct value for a new project. With the required permission under [LICENSE](LICENSE), replace these and `diagrams/example.json` to reuse the example without editing the engine.
 
 The example is illustrative, not a verified real-world architecture.
 

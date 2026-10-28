@@ -1,4 +1,4 @@
-module(name = "pure_diagramming", version = "0.1.0")
+module(name = "pure_schematic", version = "0.1.0")
 
 bazel_dep(name = "aspect_rules_js", version = "3.5.1")
 bazel_dep(name = "rules_nodejs", version = "6.7.7")

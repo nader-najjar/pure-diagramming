@@ -63,14 +63,16 @@ export function App({
   initial: Diagram;
   startupError: string;
   embedded: boolean;
-  project: { name: string; tagline: string; description: string };
+  project: { name: string; recoveryName?: string; tagline: string; description: string };
 }>): ReactElement {
   const isPortableSnapshot = embedded && startupError === '';
   // The anchor does not exist until React mounts the single-file app.
   useEffect(() => {
     if (location.hash === '#diagram') document.querySelector('#diagram')?.scrollIntoView();
   }, []);
-  const workspace = useWorkspace(initial, `pure-diagramming:v1:${project.name}:${location.pathname}`);
+  // Keep existing browser drafts reachable when only display branding changes.
+  const recoveryName = project.recoveryName ?? project.name;
+  const workspace = useWorkspace(initial, `pure-diagramming:v1:${recoveryName}:${location.pathname}`);
   const { history, editing, status, setStatus } = workspace;
   const diagram = history.document;
   const [selection, setSelection] = useState<Selection>(null);

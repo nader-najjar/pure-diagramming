@@ -287,3 +287,26 @@ test('replacing recovery and retrying failed browser writes keeps editing usable
   click('Retry browser recovery');
   expect(screen.queryByRole('button', { name: 'Retry browser recovery' })).toBeNull();
 });
+
+test('display renaming preserves the explicit recovery flow under its stable name', () => {
+  const key = `pure-diagramming:v1:Pure Diagramming:${location.pathname}`;
+  const draft = serialize({ ...example, title: 'Existing draft' });
+  localStorage.setItem(key, draft);
+  render(
+    <App
+      initial={example}
+      embedded={false}
+      startupError=""
+      project={{ ...project, name: 'Pure Schematic', recoveryName: 'Pure Diagramming' }}
+    />
+  );
+  expect(canvas().diagram.title).toBe('Example');
+  click('Edit diagram');
+  click('Cancel');
+  expect(canvas().diagram.title).toBe('Example');
+  expect(localStorage.getItem(key)).toBe(draft);
+  click('Edit diagram');
+  click('Resume recovery');
+  expect(canvas().diagram.title).toBe('Existing draft');
+  expect(localStorage.getItem(key)).toBe(draft);
+});

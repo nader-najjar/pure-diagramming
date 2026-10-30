@@ -16,8 +16,8 @@ js_library(
         "src/image-bounds.ts",
         "src/model.ts",
         "src/portable.ts",
-        "src/view.ts",
-    ],
+        "src/view.ts"
+    ]
 )
 
 js_library(
@@ -27,33 +27,33 @@ js_library(
         "src/DiagramCanvas.tsx",
         "src/EditorPanels.tsx",
         "src/export-png.ts",
-        "src/useWorkspace.ts",
+        "src/useWorkspace.ts"
     ],
     deps = [
         ":core",
         ":node_modules/@xyflow/react",
         ":node_modules/html-to-image",
-        ":node_modules/react",
-    ],
+        ":node_modules/react"
+    ]
 )
 
 js_library(
     name = "entrypoint",
     srcs = ["src/main.tsx", "src/style.css", "project.json"] + glob(["diagrams/*.json"]),
-    deps = [":browser", ":core", ":node_modules/react", ":node_modules/react-dom"],
+    deps = [":browser", ":core", ":node_modules/react", ":node_modules/react-dom"]
 )
 
 js_library(
     name = "build_config",
     srcs = ["vite.config.ts", "scripts/build-source.ts"],
-    deps = [":node_modules/vite", ":node_modules/vite-plugin-singlefile"],
+    deps = [":node_modules/vite", ":node_modules/vite-plugin-singlefile"]
 )
 
 # The source identity is an explicit action input, never ambient environment.
 js_binary(
     name = "build_site",
     entry_point = "scripts/build-site.mjs",
-    data = [":build_config", ":node_modules/vite", "scripts/materialize.ts"],
+    data = [":build_config", ":node_modules/vite", "scripts/materialize.ts"]
 )
 
 js_run_binary(
@@ -61,7 +61,7 @@ js_run_binary(
     tool = ":build_site",
     srcs = ["index.html", "package.json", "tsconfig.json", ":entrypoint"],
     env = {"SOURCE_COMMIT": "$(SOURCE_COMMIT)"},
-    out_dirs = ["dist"],
+    out_dirs = ["dist"]
 )
 
 CHECK_DATA = [":entrypoint", ":build_config", ":node_modules", "package.json", "tsconfig.json"] + glob(["scripts/*", "tests/**"])
@@ -69,7 +69,7 @@ CHECK_DATA = [":entrypoint", ":build_config", ":node_modules", "package.json", "
 tsc_bin.tsc_test(
     name = "typecheck",
     data = CHECK_DATA + ["vitest.config.ts"],
-    args = ["--noEmit"],
+    args = ["--noEmit"]
 )
 
 js_test(
@@ -77,61 +77,53 @@ js_test(
     entry_point = "scripts/run-check.mjs",
     data = CHECK_DATA + ["vitest.config.ts", "eslint.config.js", "knip.json", "index.html"],
     args = ["vitest", "run"],
-    size = "medium",
+    size = "medium"
 )
 
 eslint_bin.eslint_test(
     name = "lint",
     data = CHECK_DATA + ["eslint.config.js", "vitest.config.ts"],
-    args = ["--max-warnings", "0", "src", "scripts", "tests", "vite.config.ts", "vitest.config.ts", "eslint.config.js"],
+    args = ["--max-warnings", "0", "src", "scripts", "tests", "vite.config.ts", "vitest.config.ts", "eslint.config.js"]
 )
 
 depcruise_bin.depcruise_test(
     name = "dependency_boundaries",
     data = CHECK_DATA + [".dependency-cruiser.json"],
-    args = ["src", "scripts", "tests"],
+    args = ["src", "scripts", "tests"]
 )
 
 js_test(
     name = "unused_code",
     entry_point = "scripts/run-check.mjs",
     data = CHECK_DATA + ["knip.json", "vitest.config.ts", "eslint.config.js", "index.html"],
-    args = ["knip", "--no-progress"],
+    args = ["knip", "--no-progress"]
 )
 
 js_test(
     name = "validate_diagrams",
     entry_point = "scripts/validate-diagrams.ts",
-    data = [":core"] + glob(["diagrams/*.json"]),
+    data = [":core"] + glob(["diagrams/*.json"])
 )
 
 js_test(
     name = "artifact_contract",
     entry_point = "scripts/check-artifact.mjs",
     data = [":core", ":site", "scripts/build-source.ts"] + glob(["diagrams/*.json"]),
-    env = {"SOURCE_COMMIT": "$(SOURCE_COMMIT)"},
+    env = {"SOURCE_COMMIT": "$(SOURCE_COMMIT)"}
 )
 
 vite_bin.vite_binary(
     name = "dev",
     data = [":entrypoint", ":build_config", "index.html", "package.json", "tsconfig.json"],
     args = ["--host", "127.0.0.1"],
-    tags = ["manual"],
+    tags = ["manual"]
 )
 
 vite_bin.vite_binary(
     name = "preview",
     data = [":site", ":build_config", "package.json"],
     args = ["preview", "--host", "127.0.0.1"],
-    tags = ["manual"],
-)
-
-
-js_binary(
-    name = "print_node_and_tsdk_paths",
-    entry_point = "scripts/print-toolchain.mjs",
-    data = [":node_modules/typescript"],
-    tags = ["manual"],
+    tags = ["manual"]
 )
 
 js_test(
@@ -142,8 +134,7 @@ js_test(
         ".npmrc",
         "package.json",
         "pnpm-lock.yaml",
-        "pnpm-workspace.yaml",
-        "scripts/materialize.ts",
+        "scripts/materialize.ts"
     ],
-    args = ["$(rootpath @pnpm//:pnpm)"],
+    args = ["$(rootpath @pnpm//:pnpm)"]
 )

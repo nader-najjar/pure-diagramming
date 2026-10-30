@@ -78,14 +78,16 @@ Change Bazel in `.bazelversion`; rules and Node/pnpm in `MODULE.bazel`. Keep `.n
 
 ---
 
-Install the locked editor dependencies and print toolchain paths:
+Prepare editor dependencies and print toolchain paths:
 
 ```sh
-bazel run @pnpm -- --dir "$PWD" install --frozen-lockfile
-bazel run //:print_node_and_tsdk_paths
+bazel build @rules_nodejs//nodejs:current_node_runtime @pnpm//:pkg //:node_modules/typescript
+bazel cquery 'set(@rules_nodejs//nodejs:current_node_runtime @pnpm//:pkg //:node_modules/typescript)' --output=files \
+  | sed "s|^|$(bazel info execution_root)/|"
+bazel run @pnpm//:pnpm -- --dir "$PWD" install --frozen-lockfile
 ```
 
-Follow the [IntelliJ IDEA Ultimate](https://app.notion.com/p/f4c0a2b7875583b79fa5015d58412fea) or [VS Code](https://app.notion.com/p/4fd0a2b787558204a6c001d0b034f698) guide. Use the printed Node executable and TypeScript SDK directory, not global installations. Reprint paths after toolchain changes or cache cleanup.
+Follow the [IntelliJ IDEA Ultimate](https://app.notion.com/p/f4c0a2b7875583b79fa5015d58412fea) or [VS Code](https://app.notion.com/p/4fd0a2b787558204a6c001d0b034f698) guide. Use the printed `node` and pnpm `package` paths for JavaScript Runtime, and the TypeScript package’s `lib` directory for the TypeScript SDK, not global installations. Reprint paths after toolchain changes or cache cleanup.
 
 ### 5. Concepts
 

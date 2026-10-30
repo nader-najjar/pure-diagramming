@@ -2,7 +2,6 @@
   "entry": [
     "scripts/build-site.mjs",
     "scripts/run-check.mjs",
-    "scripts/print-toolchain.mjs",
     "scripts/validate-diagrams.ts",
     "scripts/check-artifact.mjs",
     "scripts/check-lockfile.mjs",

@@ -6,7 +6,7 @@
 
 ---
 
-**Viewing:** [open the synthetic demo](https://nader-najjar.github.io/pure-schematic/#diagram) or a supplied HTML viewer. No account, API key, backend, or installation is needed. The example is illustrative, not a verified architecture. See [verification limits](docs/VERIFICATION.md), including direct offline opening.
+**Viewing:** open a supplied HTML viewer. The public demo is unpublished. No account, API key, backend, or installation is needed. The example is illustrative, not a verified architecture. See [verification limits](docs/VERIFICATION.md), including direct offline opening.
 
 **Development:** install [Bazelisk](https://bazel.build/install/bazelisk). `.bazelversion` selects Bazel; `MODULE.bazel` pins Node and pnpm. Run commands from the repository root.
 

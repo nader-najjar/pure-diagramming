@@ -1,6 +1,6 @@
 # Build and publish the complete project site
 
-The synthetic example is published at [the project demo](https://nader-najjar.github.io/pure-schematic/#diagram); see its [deployment evidence](VERIFICATION.md). This repository has no check or publishing workflows, and merges do not redeploy the site. Reusing repository material is subject to [LICENSE](../LICENSE).
+The public demo is unpublished. Earlier [deployment evidence](VERIFICATION.md) is retained as history. This repository has no check or publishing workflows, and merges do not redeploy the site. Reusing repository material is subject to [LICENSE](../LICENSE).
 
 ## What becomes public
 
